@@ -15,61 +15,66 @@ import os
 
 #**************************************Part-1 : Extract Photos From Videos**********************************************************#
 # Read the videos from the specified path
-folder_name = input("Please Name Your Folder : ")
-video_path = "videos/" + folder_name
+#folder_name = input("Please Name Your Folder : ")
+#video_path = "videos/" + folder_name
+
+video_path = "videos/"
 print("Video Path : %s" %video_path)
 
-list_videos = os.listdir(video_path)             #List the videos uploaded
-print("List of Videos Found : %s" %list_videos)
+for item in os.listdir(video_path):
+    print("[*] Analysing Videos in : %s" %item)
+    item_path = video_path + item + "/"
+    list_videos = os.listdir(item_path)             #List the videos uploaded
+    print("[+] List of Videos Found : %s" %list_videos)
 
-# creating a folder to store photos
-photos_path = "photos/" + folder_name
-print("Path to Save Extracted Photos : %s" %photos_path)
+    # creating a folder to store photos
+    photos_path = "photos/" + item + "/"
+    print("[*] Path to Save Extracted Photos : %s" %photos_path)
 
-if not os.path.exists(photos_path):
-    try:
-        os.makedirs(photos_path)
-        print("Creating Folder to Store Photos : %s" %folder_name)
+    if not os.path.exists(photos_path):
+        try:
+            os.makedirs(photos_path)
+            print("[+] Creating Folder to Store Photos : %s" %photos_path)
 
-# if not created then raise error
-    except OSError:
-        print ("Error: Creating directory %s" %photos_path)
+    # if not created then raise error
+        except OSError:
+            print ("[-] Error: Creating directory %s" %photos_path)
 
-#Sequence Number to be appended to the extracted photos
-currentframe = 0
+    #Sequence Number to be appended to the extracted photos
+    currentframe = 0
 
-#Iterate through the videos one-by-one
-for i in list_videos:
-    vid_file = video_path + "/" + i
-    print("Analysing Video : %s" %vid_file)
-    cam = cv2.VideoCapture(vid_file)
+    #Iterate through the videos one-by-one
+    for i in list_videos:
+        vid_file = video_path + item + "/" + i
+        print("[+] Analysing Video : %s" %vid_file)
+        cam = cv2.VideoCapture(vid_file)
 
-    while(True):
+        while(True):
 
-        # reading from frame
-        ret,frame = cam.read()
+            # reading from frame
+            ret,frame = cam.read()
+    
+            if ret:
+                # if video is still left continue creating images
+                name = i.split(".")[0]                      #Cut the video file name from the extension
+                name = name + str(currentframe) + '.jpg'    #Rename the photos
+                #print ('Creating...' + name)
 
-        if ret:
-            # if video is still left continue creating images
-            name = i.split(".")[0]                      #Cut the video file name from the extension
-            name = name + str(currentframe) + '.jpg'    #Rename the photos
-            print ('Creating...' + name)
+                # writing the extracted images after sampling
+                if (currentframe % 10) == 0:                #Save only one in 10 images
+                    full_name = photos_path + "/" + name              #Full name along with the path
+                    cv2.imwrite(full_name, frame)
 
-            # writing the extracted images after sampling
-            if (currentframe % 10) == 0:                #Save only one in 10 images
-                full_name = photos_path + "/" + name              #Full name along with the path
-                cv2.imwrite(full_name, frame)
+                # increasing counter so that it will
+                # show how many frames are created
+                currentframe += 1
+            else:
+                currentframe = 0
+                break
 
-            # increasing counter so that it will
-            # show how many frames are created
-            currentframe += 1
-        else:
-            currentframe = 0
-            break
-
-    # Release all space and windows once done
-    cam.release()
-    cv2.destroyAllWindows()
+        # Release all space and windows once done
+        cam.release()
+        cv2.destroyAllWindows()
 
 #**************************************Part-2 : Train CNN Classifier to Classify Photos*********************************************#
 

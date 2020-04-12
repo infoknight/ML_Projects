@@ -71,8 +71,8 @@ test_set = test_datagen.flow_from_directory(
 
 classifier.fit_generator(
         training_set,
-        steps_per_epoch=368,               #Number of images in the Training_set
-        epochs=20,                           #GPU => 50 / 100 .....
+        steps_per_epoch=731,               #Number of images in the Training_set
+        epochs=5,                           #GPU => 50 / 100 .....
         validation_data=test_set,
-        validation_steps=92)              #Number of images in the Test_set
+        validation_steps=298)              #Number of images in the Test_set
 
